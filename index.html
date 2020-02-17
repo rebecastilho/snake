@@ -21,7 +21,33 @@
         var canvas, width, height, ctx, FPS, tileSize;
         var snake;
 
+        var keys = {
+            left: 37,
+            up: 38,
+            right: 39,
+            down: 40
+        }
+
+        
+        window.addEventListener("keydown", keyDown);
         window.addEventListener("resize", resizeWindow);
+
+        function keyDown(e) {
+            switch (e.keyCode) {
+                case keys.right:
+                    snake.direction = [1, 0];
+                    break;
+                case keys.left:
+                    snake.direction = [-1, 0];
+                    break;
+                case keys.up:
+                    snake.direction = [0, -1];
+                    break;
+                case keys.down:
+                    snake.direction = [0,1];
+            }
+
+        }
 
         function resizeWindow() {
             width = window.innerWidth;
@@ -52,11 +78,43 @@
 
         function newGame() {
             snake = new Snake();
+
+            playing = false;
         }
 
         function Snake() {
             this.body = [[10,10],[10,11],[10,12]];
             this.color = "#000";
+            this.direction = [0, -1];
+
+            this.update = function() {
+                var nextPos = [this.body[0][0] + this.direction[0], this.body[0][1] + this.direction[1]];
+
+                //tela de espera 
+                if (!playing) {
+                    //direita
+                    if (this.direction[1] == -1 &&  nextPos[1] <= (height * 0.1 / tileSize)){
+                        this.direction = [1,0];
+                    }
+                    //baixo
+                    else if (this.direction[0] == 1 &&  nextPos[0] >= (width * 0.9 / tileSize)){
+                        this.direction = [0,1];
+                    }
+                    //esquerda
+                    else if (this.direction[1] == 1 &&  nextPos[1] >= (height * 0.9 / tileSize)){
+                        this.direction = [-1,0];
+                    }
+                    //cima
+                    else if (this.direction[0] == -1 &&  nextPos[0] <= (width * 0.1 / tileSize)){
+                    this.direction = [0,-1];
+                    }
+
+                }
+
+                this.body.pop();
+                this.body.splice(0, 0, nextPos);
+
+            }
 
             this.draw = function () {
                 ctx.fillStyle = this.color;
@@ -72,6 +130,7 @@
         }
 
         function update() {
+            snake.update();
 
         }
 
